@@ -1,4 +1,4 @@
-module go-micro.dev/v4
+module github.com/whiteCcinn/go-micro/v4
 
 go 1.17
 
