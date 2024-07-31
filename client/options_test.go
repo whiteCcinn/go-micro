@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"go-micro.dev/v5/transport"
+	"go-micro.dev/v4/transport"
 )
 
 func TestCallOptions(t *testing.T) {
@@ -78,6 +78,8 @@ func TestCallOptions(t *testing.T) {
 			if e := o.CallOptions.DialTimeout * (time.Second * 10); callOpts.DialTimeout != e {
 				t.Fatalf("Expected %v got %v", e, callOpts.DialTimeout)
 			}
+
 		}
+
 	}
 }

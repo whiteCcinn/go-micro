@@ -3,32 +3,32 @@ package server
 import (
 	"bytes"
 
-	"go-micro.dev/v5/codec"
-	"go-micro.dev/v5/transport"
-	"go-micro.dev/v5/util/buf"
+	"go-micro.dev/v4/codec"
+	"go-micro.dev/v4/transport"
+	"go-micro.dev/v4/util/buf"
 )
 
 type rpcRequest struct {
-	socket      transport.Socket
-	codec       codec.Codec
-	rawBody     interface{}
-	header      map[string]string
 	service     string
 	method      string
 	endpoint    string
 	contentType string
+	socket      transport.Socket
+	codec       codec.Codec
+	header      map[string]string
 	body        []byte
+	rawBody     interface{}
 	stream      bool
 	first       bool
 }
 
 type rpcMessage struct {
-	payload     interface{}
-	header      map[string]string
-	codec       codec.NewCodec
 	topic       string
 	contentType string
+	payload     interface{}
+	header      map[string]string
 	body        []byte
+	codec       codec.NewCodec
 }
 
 func (r *rpcRequest) Codec() codec.Reader {

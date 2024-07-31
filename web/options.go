@@ -7,55 +7,48 @@ import (
 	"time"
 
 	"github.com/urfave/cli/v2"
-	"go-micro.dev/v5"
-	"go-micro.dev/v5/logger"
-	"go-micro.dev/v5/registry"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/logger"
+	"go-micro.dev/v4/registry"
 )
 
-// Options for web.
+// Options for web
 type Options struct {
-	Handler http.Handler
-
-	Logger logger.Logger
-
-	Service micro.Service
-
-	Registry registry.Registry
-
-	// Alternative Options
-	Context context.Context
-
-	Action    func(*cli.Context)
+	Name      string
+	Version   string
+	Id        string
 	Metadata  map[string]string
-	TLSConfig *tls.Config
+	Address   string
+	Advertise string
 
-	Server *http.Server
+	Action func(*cli.Context)
+	Flags  []cli.Flag
+
+	RegisterTTL      time.Duration
+	RegisterInterval time.Duration
 
 	// RegisterCheck runs a check function before registering the service
 	RegisterCheck func(context.Context) error
 
-	Version string
+	Server  *http.Server
+	Handler http.Handler
 
-	// Static directory
-	StaticDir string
+	// Alternative Options
+	Context context.Context
 
-	Advertise string
+	Registry registry.Registry
+	Service  micro.Service
+	Logger   logger.Logger
 
-	Address string
-	Name    string
-	Id      string
-	Flags   []cli.Flag
-
+	Secure      bool
+	TLSConfig   *tls.Config
 	BeforeStart []func() error
 	BeforeStop  []func() error
 	AfterStart  []func() error
 	AfterStop   []func() error
 
-	RegisterInterval time.Duration
-
-	RegisterTTL time.Duration
-
-	Secure bool
+	// Static directory
+	StaticDir string
 
 	Signal bool
 }
@@ -86,53 +79,52 @@ func newOptions(opts ...Option) Options {
 	return opt
 }
 
-// Name of Web.
+// Name of Web
 func Name(n string) Option {
 	return func(o *Options) {
 		o.Name = n
 	}
 }
 
-// Icon specifies an icon url to load in the UI.
+// Icon specifies an icon url to load in the UI
 func Icon(ico string) Option {
 	return func(o *Options) {
 		if o.Metadata == nil {
 			o.Metadata = make(map[string]string)
 		}
-
 		o.Metadata["icon"] = ico
 	}
 }
 
-// Id for Unique server id.
+// Id for Unique server id
 func Id(id string) Option {
 	return func(o *Options) {
 		o.Id = id
 	}
 }
 
-// Version of the service.
+// Version of the service
 func Version(v string) Option {
 	return func(o *Options) {
 		o.Version = v
 	}
 }
 
-// Metadata associated with the service.
+// Metadata associated with the service
 func Metadata(md map[string]string) Option {
 	return func(o *Options) {
 		o.Metadata = md
 	}
 }
 
-// Address to bind to - host:port.
+// Address to bind to - host:port
 func Address(a string) Option {
 	return func(o *Options) {
 		o.Address = a
 	}
 }
 
-// Advertise The address to advertise for discovery - host:port.
+// Advertise The address to advertise for discovery - host:port
 func Advertise(a string) Option {
 	return func(o *Options) {
 		o.Advertise = a
@@ -148,42 +140,42 @@ func Context(ctx context.Context) Option {
 	}
 }
 
-// Registry used for discovery.
+// Registry used for discovery
 func Registry(r registry.Registry) Option {
 	return func(o *Options) {
 		o.Registry = r
 	}
 }
 
-// RegisterTTL Register the service with a TTL.
+// RegisterTTL Register the service with a TTL
 func RegisterTTL(t time.Duration) Option {
 	return func(o *Options) {
 		o.RegisterTTL = t
 	}
 }
 
-// RegisterInterval Register the service with at interval.
+// RegisterInterval Register the service with at interval
 func RegisterInterval(t time.Duration) Option {
 	return func(o *Options) {
 		o.RegisterInterval = t
 	}
 }
 
-// Handler for custom handler.
+// Handler for custom handler
 func Handler(h http.Handler) Option {
 	return func(o *Options) {
 		o.Handler = h
 	}
 }
 
-// Server for custom Server.
+// Server for custom Server
 func Server(srv *http.Server) Option {
 	return func(o *Options) {
 		o.Server = srv
 	}
 }
 
-// MicroService sets the micro.Service used internally.
+// MicroService sets the micro.Service used internally
 func MicroService(s micro.Service) Option {
 	return func(o *Options) {
 		o.Service = s
@@ -232,8 +224,7 @@ func AfterStop(fn func() error) Option {
 	}
 }
 
-// Secure Use secure communication.
-// If TLSConfig is not specified we use InsecureSkipVerify and generate a self signed cert.
+// Secure Use secure communication. If TLSConfig is not specified we use InsecureSkipVerify and generate a self signed cert
 func Secure(b bool) Option {
 	return func(o *Options) {
 		o.Secure = b
@@ -247,14 +238,14 @@ func TLSConfig(t *tls.Config) Option {
 	}
 }
 
-// StaticDir sets the static file directory. This defaults to ./html.
+// StaticDir sets the static file directory. This defaults to ./html
 func StaticDir(d string) Option {
 	return func(o *Options) {
 		o.StaticDir = d
 	}
 }
 
-// RegisterCheck run func before registry service.
+// RegisterCheck run func before registry service
 func RegisterCheck(fn func(context.Context) error) Option {
 	return func(o *Options) {
 		o.RegisterCheck = fn
@@ -270,7 +261,7 @@ func HandleSignal(b bool) Option {
 	}
 }
 
-// Logger sets the underline logger.
+// Logger sets the underline logger
 func Logger(l logger.Logger) Option {
 	return func(o *Options) {
 		o.Logger = l

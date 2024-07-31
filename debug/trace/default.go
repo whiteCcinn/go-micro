@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"go-micro.dev/v5/util/ring"
+	"go-micro.dev/v4/util/ring"
 )
 
 type memTracer struct {
+	opts Options
 
 	// ring buffer of traces
 	buffer *ring.Buffer
-	opts   Options
 }
 
 func (t *memTracer) Read(opts ...ReadOption) ([]*Span, error) {

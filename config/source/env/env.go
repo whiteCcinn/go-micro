@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/imdario/mergo"
-	"go-micro.dev/v5/config/source"
+	"go-micro.dev/v4/config/source"
 )
 
 var (
@@ -15,15 +15,16 @@ var (
 )
 
 type env struct {
-	opts             source.Options
 	prefixes         []string
 	strippedPrefixes []string
+	opts             source.Options
 }
 
 func (e *env) Read() (*source.ChangeSet, error) {
 	var changes map[string]interface{}
 
 	for _, env := range os.Environ() {
+
 		if len(e.prefixes) > 0 || len(e.strippedPrefixes) > 0 {
 			notFound := true
 

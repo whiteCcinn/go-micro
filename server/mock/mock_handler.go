@@ -1,14 +1,14 @@
 package mock
 
 import (
-	"go-micro.dev/v5/registry"
-	"go-micro.dev/v5/server"
+	"go-micro.dev/v4/registry"
+	"go-micro.dev/v4/server"
 )
 
 type MockHandler struct {
+	Id   string
 	Opts server.HandlerOptions
 	Hdlr interface{}
-	Id   string
 }
 
 func (m *MockHandler) Name() string {

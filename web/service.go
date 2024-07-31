@@ -13,28 +13,30 @@ import (
 	"time"
 
 	"github.com/urfave/cli/v2"
-	"go-micro.dev/v5"
-	log "go-micro.dev/v5/logger"
-	"go-micro.dev/v5/registry"
-	maddr "go-micro.dev/v5/util/addr"
-	"go-micro.dev/v5/util/backoff"
-	mhttp "go-micro.dev/v5/util/http"
-	mnet "go-micro.dev/v5/util/net"
-	signalutil "go-micro.dev/v5/util/signal"
-	mls "go-micro.dev/v5/util/tls"
+
+	"go-micro.dev/v4"
+
+	log "go-micro.dev/v4/logger"
+	"go-micro.dev/v4/registry"
+	maddr "go-micro.dev/v4/util/addr"
+	"go-micro.dev/v4/util/backoff"
+	mhttp "go-micro.dev/v4/util/http"
+	mnet "go-micro.dev/v4/util/net"
+	signalutil "go-micro.dev/v4/util/signal"
+	mls "go-micro.dev/v4/util/tls"
 )
 
 type service struct {
+	opts Options
+
 	mux *http.ServeMux
 	srv *registry.Service
-
-	exit chan chan error
-	ex   chan bool
-	opts Options
 
 	sync.RWMutex
 	running bool
 	static  bool
+	exit    chan chan error
+	ex      chan bool
 }
 
 func newService(opts ...Option) Service {
@@ -46,16 +48,13 @@ func newService(opts ...Option) Service {
 		ex:     make(chan bool),
 	}
 	s.srv = s.genSrv()
-
 	return s
 }
 
 func (s *service) genSrv() *registry.Service {
-	var (
-		host string
-		port string
-		err  error
-	)
+	var host string
+	var port string
+	var err error
 
 	logger := s.opts.Logger
 
@@ -156,12 +155,10 @@ func (s *service) register() error {
 			regErr = err
 			// backoff then retry
 			time.Sleep(backoff.Do(i + 1))
-
 			continue
 		}
 		// success so nil error
 		regErr = nil
-
 		break
 	}
 
@@ -181,7 +178,6 @@ func (s *service) deregister() error {
 	if s.opts.Registry != nil {
 		r = s.opts.Registry
 	}
-
 	return r.Deregister(s.srv)
 }
 
@@ -199,24 +195,24 @@ func (s *service) start() error {
 		}
 	}
 
-	listener, err := s.listen("tcp", s.opts.Address)
+	l, err := s.listen("tcp", s.opts.Address)
 	if err != nil {
 		return err
 	}
 
 	logger := s.opts.Logger
 
-	s.opts.Address = listener.Addr().String()
+	s.opts.Address = l.Addr().String()
 	srv := s.genSrv()
 	srv.Endpoints = s.srv.Endpoints
 	s.srv = srv
 
-	var handler http.Handler
+	var h http.Handler
 
 	if s.opts.Handler != nil {
-		handler = s.opts.Handler
+		h = s.opts.Handler
 	} else {
-		handler = s.mux
+		h = s.mux
 		var r sync.Once
 
 		// register the html dir
@@ -246,9 +242,9 @@ func (s *service) start() error {
 		httpSrv = &http.Server{}
 	}
 
-	httpSrv.Handler = handler
+	httpSrv.Handler = h
 
-	go httpSrv.Serve(listener)
+	go httpSrv.Serve(l)
 
 	for _, fn := range s.opts.AfterStart {
 		if err := fn(); err != nil {
@@ -261,11 +257,10 @@ func (s *service) start() error {
 
 	go func() {
 		ch := <-s.exit
-		ch <- listener.Close()
+		ch <- l.Close()
 	}()
 
-	logger.Logf(log.InfoLevel, "Listening on %v", listener.Addr().String())
-
+	logger.Logf(log.InfoLevel, "Listening on %v", l.Addr().String())
 	return nil
 }
 
@@ -294,7 +289,6 @@ func (s *service) stop() error {
 			if chErr := <-ch; chErr != nil {
 				return chErr
 			}
-
 			return err
 		}
 	}
@@ -343,8 +337,8 @@ func (s *service) Handle(pattern string, handler http.Handler) {
 }
 
 func (s *service) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
-	var seen bool
 
+	var seen bool
 	s.RLock()
 	for _, ep := range s.srv.Endpoints {
 		if ep.Name == pattern {
@@ -435,9 +429,7 @@ func (s *service) Init(opts ...Option) error {
 	if s.opts.Service.Name() == "" {
 		serviceOpts = append(serviceOpts, micro.Name(s.opts.Name))
 	}
-
 	serviceOpts = append(serviceOpts, micro.Version(s.opts.Version))
-
 	s.RUnlock()
 
 	s.opts.Service.Init(serviceOpts...)
@@ -493,7 +485,6 @@ func (s *service) Run() error {
 		if err := s.opts.Service.Options().Profile.Start(); err != nil {
 			return err
 		}
-
 		defer func() {
 			if err := s.opts.Service.Options().Profile.Stop(); err != nil {
 				logger.Log(log.ErrorLevel, err)
@@ -532,16 +523,14 @@ func (s *service) Run() error {
 	return s.stop()
 }
 
-// Options returns the options for the given service.
+// Options returns the options for the given service
 func (s *service) Options() Options {
 	return s.opts
 }
 
 func (s *service) listen(network, addr string) (net.Listener, error) {
-	var (
-		listener net.Listener
-		err      error
-	)
+	var l net.Listener
+	var err error
 
 	// TODO: support use of listen options
 	if s.opts.Secure || s.opts.TLSConfig != nil {
@@ -567,22 +556,21 @@ func (s *service) listen(network, addr string) (net.Listener, error) {
 				}
 				config = &tls.Config{Certificates: []tls.Certificate{cert}}
 			}
-
 			return tls.Listen(network, addr, config)
 		}
 
-		listener, err = mnet.Listen(addr, fn)
+		l, err = mnet.Listen(addr, fn)
 	} else {
 		fn := func(addr string) (net.Listener, error) {
 			return net.Listen(network, addr)
 		}
 
-		listener, err = mnet.Listen(addr, fn)
+		l, err = mnet.Listen(addr, fn)
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	return listener, nil
+	return l, nil
 }

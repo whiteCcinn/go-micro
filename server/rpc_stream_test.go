@@ -10,11 +10,11 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"go-micro.dev/v5/codec/json"
-	protoCodec "go-micro.dev/v5/codec/proto"
+	"go-micro.dev/v4/codec/json"
+	protoCodec "go-micro.dev/v4/codec/proto"
 )
 
-// protoStruct implements proto.Message.
+// protoStruct implements proto.Message
 type protoStruct struct {
 	Payload string `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
 }
@@ -23,7 +23,7 @@ func (m *protoStruct) Reset()         { *m = protoStruct{} }
 func (m *protoStruct) String() string { return proto.CompactTextString(m) }
 func (*protoStruct) ProtoMessage()    {}
 
-// safeBuffer throws away everything and wont Read data back.
+// safeBuffer throws away everything and wont Read data back
 type safeBuffer struct {
 	sync.RWMutex
 	buf []byte

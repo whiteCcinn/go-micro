@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/urfave/cli/v2"
-	"go-micro.dev/v5/config/source"
+	"go-micro.dev/v4/config/source"
 )
 
 type contextKey struct{}
 
-// Context sets the cli context.
+// Context sets the cli context
 func Context(c *cli.Context) source.Option {
 	return func(o *source.Options) {
 		if o.Context == nil {

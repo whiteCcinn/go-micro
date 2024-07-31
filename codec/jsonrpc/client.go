@@ -6,28 +6,26 @@ import (
 	"io"
 	"sync"
 
-	"go-micro.dev/v5/codec"
+	"go-micro.dev/v4/codec"
 )
 
 type clientCodec struct {
+	dec *json.Decoder // for reading JSON values
+	enc *json.Encoder // for writing JSON values
+	c   io.Closer
 
 	// temporary work space
 	req  clientRequest
 	resp clientResponse
 
-	c io.Closer
-
-	dec     *json.Decoder // for reading JSON values
-	enc     *json.Encoder // for writing JSON values
-	pending map[interface{}]string
-
 	sync.Mutex
+	pending map[interface{}]string
 }
 
 type clientRequest struct {
+	Method string         `json:"method"`
 	Params [1]interface{} `json:"params"`
 	ID     interface{}    `json:"id"`
-	Method string         `json:"method"`
 }
 
 type clientResponse struct {

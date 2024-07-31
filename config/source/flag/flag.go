@@ -3,11 +3,10 @@ package flag
 import (
 	"errors"
 	"flag"
+	"github.com/imdario/mergo"
+	"go-micro.dev/v4/config/source"
 	"strings"
 	"time"
-
-	"github.com/imdario/mergo"
-	"go-micro.dev/v5/config/source"
 )
 
 type flagsrc struct {

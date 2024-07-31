@@ -6,12 +6,12 @@ import (
 	rtime "runtime"
 	"sync"
 
-	"go-micro.dev/v5/client"
-	"go-micro.dev/v5/cmd"
-	log "go-micro.dev/v5/logger"
-	"go-micro.dev/v5/server"
-	"go-micro.dev/v5/store"
-	signalutil "go-micro.dev/v5/util/signal"
+	"go-micro.dev/v4/client"
+	log "go-micro.dev/v4/logger"
+	"go-micro.dev/v4/server"
+	"go-micro.dev/v4/store"
+	"go-micro.dev/v4/util/cmd"
+	signalutil "go-micro.dev/v4/util/signal"
 )
 
 type service struct {
@@ -30,7 +30,7 @@ func (s *service) Name() string {
 	return s.opts.Server.Options().Name
 }
 
-// Init initializes options. Additionally it calls cmd.Init
+// Init initialises options. Additionally it calls cmd.Init
 // which parses command line flags. cmd.Init is only called
 // on first Init.
 func (s *service) Init(opts ...Option) {
@@ -45,11 +45,12 @@ func (s *service) Init(opts ...Option) {
 			s.opts.Cmd.App().Name = s.Server().Options().Name
 		}
 
-		// Initialize the command flags, overriding new service
+		// Initialise the command flags, overriding new service
 		if err := s.opts.Cmd.Init(
 			cmd.Auth(&s.opts.Auth),
 			cmd.Broker(&s.opts.Broker),
 			cmd.Registry(&s.opts.Registry),
+			cmd.Runtime(&s.opts.Runtime),
 			cmd.Transport(&s.opts.Transport),
 			cmd.Client(&s.opts.Client),
 			cmd.Config(&s.opts.Config),
@@ -60,14 +61,11 @@ func (s *service) Init(opts ...Option) {
 			s.opts.Logger.Log(log.FatalLevel, err)
 		}
 
-		// If the store has no Table set, fallback to the
-		// services name
-		if len(s.opts.Store.Options().Table) == 0 {
-			name := s.opts.Cmd.App().Name
-			err := s.opts.Store.Init(store.Table(name))
-			if err != nil {
-				s.opts.Logger.Log(log.FatalLevel, err)
-			}
+		// Explicitly set the table name to the service name
+		name := s.opts.Cmd.App().Name
+		err := s.opts.Store.Init(store.Table(name))
+		if err != nil {
+			s.opts.Logger.Log(log.FatalLevel, err)
 		}
 	})
 }
@@ -115,7 +113,7 @@ func (s *service) Stop() error {
 		err = fn()
 	}
 
-	if err := s.opts.Server.Stop(); err != nil {
+	if err = s.opts.Server.Stop(); err != nil {
 		return err
 	}
 
@@ -146,10 +144,10 @@ func (s *service) Run() (err error) {
 		if err = s.opts.Profile.Start(); err != nil {
 			return err
 		}
-
 		defer func() {
-			if nerr := s.opts.Profile.Stop(); nerr != nil {
-				logger.Log(log.ErrorLevel, nerr)
+			err = s.opts.Profile.Stop()
+			if err != nil {
+				logger.Log(log.ErrorLevel, err)
 			}
 		}()
 	}

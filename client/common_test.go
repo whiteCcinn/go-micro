@@ -1,11 +1,11 @@
 package client
 
 import (
-	"go-micro.dev/v5/registry"
+	"go-micro.dev/v4/registry"
 )
 
 var (
-	// mock data.
+	// mock data
 	testData = map[string][]*registry.Service{
 		"foo": {
 			{

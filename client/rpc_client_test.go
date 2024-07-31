@@ -5,14 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	"go-micro.dev/v5/errors"
-	"go-micro.dev/v5/registry"
-	"go-micro.dev/v5/selector"
-)
-
-const (
-	serviceName     = "test.service"
-	serviceEndpoint = "Test.Endpoint"
+	"go-micro.dev/v4/errors"
+	"go-micro.dev/v4/registry"
+	"go-micro.dev/v4/selector"
 )
 
 func newTestRegistry() registry.Registry {
@@ -21,12 +16,12 @@ func newTestRegistry() registry.Registry {
 
 func TestCallAddress(t *testing.T) {
 	var called bool
-	service := serviceName
-	endpoint := serviceEndpoint
+	service := "test.service"
+	endpoint := "Test.Endpoint"
 	address := "10.1.10.1:8080"
 
 	wrap := func(cf CallFunc) CallFunc {
-		return func(_ context.Context, node *registry.Node, req Request, _ interface{}, _ CallOptions) error {
+		return func(ctx context.Context, node *registry.Node, req Request, rsp interface{}, opts CallOptions) error {
 			called = true
 
 			if req.Service() != service {
@@ -51,10 +46,7 @@ func TestCallAddress(t *testing.T) {
 		Registry(r),
 		WrapCall(wrap),
 	)
-
-	if err := c.Options().Selector.Init(selector.Registry(r)); err != nil {
-		t.Fatal("failed to initialize selector", err)
-	}
+	c.Options().Selector.Init(selector.Registry(r))
 
 	req := c.NewRequest(service, endpoint, nil)
 
@@ -66,6 +58,7 @@ func TestCallAddress(t *testing.T) {
 	if !called {
 		t.Fatal("wrapper not called")
 	}
+
 }
 
 func TestCallRetry(t *testing.T) {
@@ -76,11 +69,12 @@ func TestCallRetry(t *testing.T) {
 	var called int
 
 	wrap := func(cf CallFunc) CallFunc {
-		return func(_ context.Context, _ *registry.Node, _ Request, _ interface{}, _ CallOptions) error {
+		return func(ctx context.Context, node *registry.Node, req Request, rsp interface{}, opts CallOptions) error {
 			called++
 			if called == 1 {
 				return errors.InternalServerError("test.error", "retry request")
 			}
+
 			// don't do the call
 			return nil
 		}
@@ -90,13 +84,8 @@ func TestCallRetry(t *testing.T) {
 	c := NewClient(
 		Registry(r),
 		WrapCall(wrap),
-		Retry(RetryAlways),
-		Retries(1),
 	)
-
-	if err := c.Options().Selector.Init(selector.Registry(r)); err != nil {
-		t.Fatal("failed to initialize selector", err)
-	}
+	c.Options().Selector.Init(selector.Registry(r))
 
 	req := c.NewRequest(service, endpoint, nil)
 
@@ -119,7 +108,7 @@ func TestCallWrapper(t *testing.T) {
 	address := "10.1.10.1:8080"
 
 	wrap := func(cf CallFunc) CallFunc {
-		return func(_ context.Context, node *registry.Node, req Request, _ interface{}, _ CallOptions) error {
+		return func(ctx context.Context, node *registry.Node, req Request, rsp interface{}, opts CallOptions) error {
 			called = true
 
 			if req.Service() != service {
@@ -144,12 +133,9 @@ func TestCallWrapper(t *testing.T) {
 		Registry(r),
 		WrapCall(wrap),
 	)
+	c.Options().Selector.Init(selector.Registry(r))
 
-	if err := c.Options().Selector.Init(selector.Registry(r)); err != nil {
-		t.Fatal("failed to initialize selector", err)
-	}
-
-	err := r.Register(&registry.Service{
+	r.Register(&registry.Service{
 		Name:    service,
 		Version: "latest",
 		Nodes: []*registry.Node{
@@ -162,9 +148,6 @@ func TestCallWrapper(t *testing.T) {
 			},
 		},
 	})
-	if err != nil {
-		t.Fatal("failed to register service", err)
-	}
 
 	req := c.NewRequest(service, endpoint, nil)
 	if err := c.Call(context.Background(), req, nil); err != nil {

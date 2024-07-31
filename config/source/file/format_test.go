@@ -3,7 +3,7 @@ package file
 import (
 	"testing"
 
-	"go-micro.dev/v5/config/source"
+	"go-micro.dev/v4/config/source"
 )
 
 func TestFormat(t *testing.T) {
@@ -27,4 +27,5 @@ func TestFormat(t *testing.T) {
 			t.Fatalf("%s: expected %s got %s", d.p, d.f, f)
 		}
 	}
+
 }

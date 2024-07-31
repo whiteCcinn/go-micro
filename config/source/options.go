@@ -3,9 +3,9 @@ package source
 import (
 	"context"
 
-	"go-micro.dev/v5/client"
-	"go-micro.dev/v5/config/encoder"
-	"go-micro.dev/v5/config/encoder/json"
+	"go-micro.dev/v4/client"
+	"go-micro.dev/v4/config/encoder"
+	"go-micro.dev/v4/config/encoder/json"
 )
 
 type Options struct {
@@ -35,14 +35,14 @@ func NewOptions(opts ...Option) Options {
 	return options
 }
 
-// WithEncoder sets the source encoder.
+// WithEncoder sets the source encoder
 func WithEncoder(e encoder.Encoder) Option {
 	return func(o *Options) {
 		o.Encoder = e
 	}
 }
 
-// WithClient sets the source client.
+// WithClient sets the source client
 func WithClient(c client.Client) Option {
 	return func(o *Options) {
 		o.Client = c

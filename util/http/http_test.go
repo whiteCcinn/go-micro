@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"go-micro.dev/v5/registry"
+	"go-micro.dev/v4/registry"
 )
 
 func TestRoundTripper(t *testing.T) {
@@ -77,4 +77,5 @@ func TestRoundTripper(t *testing.T) {
 	if string(b) != "hello world" {
 		t.Fatal("response is", string(b))
 	}
+
 }

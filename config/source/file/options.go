@@ -4,13 +4,13 @@ import (
 	"context"
 	"io/fs"
 
-	"go-micro.dev/v5/config/source"
+	"go-micro.dev/v4/config/source"
 )
 
 type filePathKey struct{}
 type fsKey struct{}
 
-// WithPath sets the path to file.
+// WithPath sets the path to file
 func WithPath(p string) source.Option {
 	return func(o *source.Options) {
 		if o.Context == nil {
@@ -20,7 +20,7 @@ func WithPath(p string) source.Option {
 	}
 }
 
-// WithFS sets the underlying filesystem to lookup file from  (default os.FS).
+// WithFS sets the underlying filesystem to lookup file from  (default os.FS)
 func WithFS(fs fs.FS) source.Option {
 	return func(o *source.Options) {
 		if o.Context == nil {

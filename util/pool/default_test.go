@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"go-micro.dev/v5/transport"
+	"go-micro.dev/v4/transport"
 )
 
 func testPool(t *testing.T, size int, ttl time.Duration) {
@@ -73,12 +73,12 @@ func testPool(t *testing.T, size int, ttl time.Duration) {
 		// release the conn
 		p.Release(c, nil)
 
-		p.mu.Lock()
+		p.Lock()
 		if i := len(p.conns[l.Addr()]); i > size {
-			p.mu.Unlock()
+			p.Unlock()
 			t.Fatalf("pool size %d is greater than expected %d", i, size)
 		}
-		p.mu.Unlock()
+		p.Unlock()
 	}
 }
 

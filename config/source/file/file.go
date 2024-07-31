@@ -6,13 +6,13 @@ import (
 	"io/fs"
 	"os"
 
-	"go-micro.dev/v5/config/source"
+	"go-micro.dev/v4/config/source"
 )
 
 type file struct {
-	opts source.Options
 	fs   fs.FS
 	path string
+	opts source.Options
 }
 
 var (

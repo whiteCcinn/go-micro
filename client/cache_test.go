@@ -5,8 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"go-micro.dev/v5/metadata"
-	"go-micro.dev/v5/transport/headers"
+	"go-micro.dev/v4/metadata"
 )
 
 func TestCache(t *testing.T) {
@@ -66,7 +65,7 @@ func TestCacheKey(t *testing.T) {
 	})
 
 	t.Run("DifferentMetadata", func(t *testing.T) {
-		mdCtx := metadata.Set(context.TODO(), headers.Namespace, "bar")
+		mdCtx := metadata.Set(context.TODO(), "Micro-Namespace", "bar")
 		key1 := key(mdCtx, &req1)
 		key2 := key(ctx, &req1)
 

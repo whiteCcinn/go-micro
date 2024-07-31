@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"go-micro.dev/v5/config/source"
+	"go-micro.dev/v4/config/source"
 )
 
 type memory struct {
+	sync.RWMutex
 	ChangeSet *source.ChangeSet
 	Watchers  map[string]*watcher
-	sync.RWMutex
 }
 
 func (s *memory) Read() (*source.ChangeSet, error) {

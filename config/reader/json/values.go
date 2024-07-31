@@ -8,8 +8,8 @@ import (
 	"time"
 
 	simple "github.com/bitly/go-simplejson"
-	"go-micro.dev/v5/config/reader"
-	"go-micro.dev/v5/config/source"
+	"go-micro.dev/v4/config/reader"
+	"go-micro.dev/v4/config/source"
 )
 
 type jsonValues struct {
@@ -190,7 +190,7 @@ func (j *jsonValue) Scan(v interface{}) error {
 func (j *jsonValue) Bytes() []byte {
 	b, err := j.Json.Bytes()
 	if err != nil {
-		// try return marshaled
+		// try return marshalled
 		b, err = j.Json.MarshalJSON()
 		if err != nil {
 			return []byte{}

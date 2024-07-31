@@ -5,15 +5,15 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"go-micro.dev/v5/server"
+	"go-micro.dev/v4/server"
 )
 
 type MockServer struct {
+	sync.Mutex
+	Running     bool
 	Opts        server.Options
 	Handlers    map[string]server.Handler
 	Subscribers map[string][]server.Subscriber
-	sync.Mutex
-	Running bool
 }
 
 var (

@@ -6,18 +6,18 @@ import (
 	"io"
 	"sync"
 
-	"go-micro.dev/v5/codec"
+	"go-micro.dev/v4/codec"
 )
 
-// Implements the Streamer interface.
+// Implements the Streamer interface
 type rpcStream struct {
+	sync.RWMutex
+	id      string
+	closed  bool
 	err     error
 	request Request
 	codec   codec.Codec
 	context context.Context
-	id      string
-	sync.RWMutex
-	closed bool
 }
 
 func (r *rpcStream) Context() context.Context {

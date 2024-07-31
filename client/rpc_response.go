@@ -1,15 +1,15 @@
 package client
 
 import (
-	"go-micro.dev/v5/codec"
-	"go-micro.dev/v5/transport"
+	"go-micro.dev/v4/codec"
+	"go-micro.dev/v4/transport"
 )
 
 type rpcResponse struct {
-	socket transport.Socket
-	codec  codec.Codec
 	header map[string]string
 	body   []byte
+	socket transport.Socket
+	codec  codec.Codec
 }
 
 func (r *rpcResponse) Codec() codec.Reader {

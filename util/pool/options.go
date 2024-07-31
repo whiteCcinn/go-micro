@@ -3,14 +3,13 @@ package pool
 import (
 	"time"
 
-	"go-micro.dev/v5/transport"
+	"go-micro.dev/v4/transport"
 )
 
 type Options struct {
-	Transport    transport.Transport
-	TTL          time.Duration
-	CloseTimeout time.Duration
-	Size         int
+	Transport transport.Transport
+	TTL       time.Duration
+	Size      int
 }
 
 type Option func(*Options)
@@ -30,11 +29,5 @@ func Transport(t transport.Transport) Option {
 func TTL(t time.Duration) Option {
 	return func(o *Options) {
 		o.TTL = t
-	}
-}
-
-func CloseTimeout(t time.Duration) Option {
-	return func(o *Options) {
-		o.CloseTimeout = t
 	}
 }
